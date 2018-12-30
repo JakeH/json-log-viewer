@@ -11,7 +11,7 @@ const Picker = require('./Picker');
 const FIELDS = ['timestamp', 'level', 'message'];
 
 class MainPanel extends BaseWidget {
-  constructor(opts={}) {
+  constructor(opts = {}) {
     super(Object.assign({}, { top: '0', height: '99%', handleKeys: true }, opts));
 
     this.currentPage = opts.currentPage || 1;
@@ -78,7 +78,7 @@ class MainPanel extends BaseWidget {
 
     const filters = _.cloneDeep(this.filters);
     if (this.levelFilter) {
-      filters.push({ key: 'level', value: this.levelFilter } );
+      filters.push({ key: 'level', value: this.levelFilter });
     }
 
     if (!filters.length) {
@@ -103,7 +103,7 @@ class MainPanel extends BaseWidget {
     }));
   }
 
-  renderLines(notify=true) {
+  renderLines(notify = true) {
     this.resetMode();
     this.rows = this.lines.slice(this.initialRow, this.initialRow + this.height - 2);
     this.update(notify);
@@ -336,7 +336,7 @@ class MainPanel extends BaseWidget {
     });
   }
 
-  openSearch(clear=false) {
+  openSearch(clear = false) {
     this.setMode('search');
     if (clear) {
       this.lastSearchTerm = null;
@@ -346,7 +346,7 @@ class MainPanel extends BaseWidget {
 
   openGoToLine() {
     this.setMode('GOTO');
-    this.prompt('Line:', '', (value) => this.moveToLine(parseInt(value, 10)-1));
+    this.prompt('Line:', '', (value) => this.moveToLine(parseInt(value, 10) - 1));
   }
 
   searchTerm(term, caseSensitive, startRow) {
@@ -384,12 +384,12 @@ class MainPanel extends BaseWidget {
     });
   }
 
-  search(term=this.lastSearchTerm) {
+  search(term = this.lastSearchTerm) {
     if (!term) {
       return this.message('No previous search');
     }
     this.lastSearchTerm = term;
-    const pos = this.searchTerm(term, false, this.row+1);
+    const pos = this.searchTerm(term, false, this.row + 1);
     if (pos > -1) {
       this.moveToLine(pos);
     } else {
@@ -496,8 +496,8 @@ class MainPanel extends BaseWidget {
     return this.initialRow + this.pageHeight;
   }
 
-  update(notify=true) {
-    this.setLabel(`[{bold} ${this.file} {/}] [{bold} ${this.row+1}/${this.lastRow+1} {/}]`);
+  update(notify = true) {
+    this.setLabel(`[{bold} ${this.file} {/}] [{bold} ${this.row + 1}/${this.lastRow + 1} {/}]`);
 
     const columns = [
       { title: 'Timestamp', key: 'timestamp' },
@@ -505,7 +505,7 @@ class MainPanel extends BaseWidget {
       { title: 'D', key: 'data', length: 1, format: v => _.isEmpty(v) ? ' ' : '*' },
       { title: 'Message', key: 'message' },
     ];
-  
+
     const highlight = (row, index) => {
       const str = row.split('\n')[0];
       if (index === this.relativeRow) {
@@ -515,10 +515,10 @@ class MainPanel extends BaseWidget {
     };
 
     const content = formatRows(
-      this.rows, columns, this.colSpacing, this.pageWidth-1).map(highlight).join('\n');
+      this.rows, columns, this.colSpacing, this.pageWidth - 1).map(highlight).join('\n');
 
-    const existing = this.children.filter(o => o.type === 'element');
-    const list = existing && existing[0] || blessed.element({ tags: true });
+    const [existing] = this.children.filter(o => o.type === 'element');
+    const list = existing || blessed.element({ tags: true });
 
     list.setContent(content);
 
