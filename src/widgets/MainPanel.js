@@ -240,7 +240,9 @@ class MainPanel extends BaseWidget {
   }
 
   resetMode() {
-    this.setMode('normal');
+    if (this.mode !== 'normal') {
+      this.setMode('normal');
+    }
   }
 
   openFilter() {
@@ -427,6 +429,10 @@ class MainPanel extends BaseWidget {
   }
 
   moveUp() {
+    if (this.row === 0) {
+      return;
+    }
+
     this.row = Math.max(0, this.row - 1);
     const outside = this.row < this.initialRow;
     if (outside) {
@@ -436,6 +442,10 @@ class MainPanel extends BaseWidget {
   }
 
   moveDown() {
+    if (this.row === this.lastRow) {
+      return;
+    }
+
     this.row = Math.min(this.lastRow, this.row + 1);
     const outside = this.row > this.lastVisibleLine;
     if (outside) {
@@ -457,6 +467,9 @@ class MainPanel extends BaseWidget {
   }
 
   pageDown() {
+    if (this.row === this.lastRow) {
+      return;
+    }
     const relativeRow = this.relativeRow;
     this.row = Math.min(this.lastRow, this.row + this.pageHeight);
     this.initialRow = this.row - relativeRow;
@@ -465,9 +478,6 @@ class MainPanel extends BaseWidget {
 
   pageUp() {
     const relativeRow = this.relativeRow;
-    if (this.row - this.pageHeight < 0) {
-      return;
-    }
     this.row = Math.max(0, this.row - this.pageHeight);
     this.initialRow = Math.max(0, this.row - relativeRow);
     this.renderLines();
@@ -495,7 +505,7 @@ class MainPanel extends BaseWidget {
       { title: 'D', key: 'data', length: 1, format: v => _.isEmpty(v) ? ' ' : '*' },
       { title: 'Message', key: 'message' },
     ];
-
+  
     const highlight = (row, index) => {
       const str = row.split('\n')[0];
       if (index === this.relativeRow) {
@@ -506,7 +516,12 @@ class MainPanel extends BaseWidget {
 
     const content = formatRows(
       this.rows, columns, this.colSpacing, this.pageWidth-1).map(highlight).join('\n');
-    const list = blessed.element({ tags: true, content });
+
+    const existing = this.children.filter(o => o.type === 'element');
+    const list = existing && existing[0] || blessed.element({ tags: true });
+
+    list.setContent(content);
+
     this.append(list);
     this.screen.render();
     if (notify) {
