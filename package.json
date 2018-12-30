@@ -38,6 +38,7 @@
     "timekeeper": "1.0.0"
   },
   "scripts": {
+    "debug": "node --inspect=9229 ./src/index ./test/fixtures/workflow-engine.log.2017-09-25",
     "lint": "./node_modules/.bin/eslint --ext .js src test",
     "test": "NODE_ENV=test ./node_modules/.bin/mocha --timeout 5000 --require test/support/test-helper.js test/*.test.js test/**/*.test.js",
     "test:watch": "NODE_ENV=test ./node_modules/.bin/mocha --watch --timeout 5000 --require test/support/test-helper.js test/*.test.js test/**/*.test.js"
