@@ -1,10 +1,18 @@
-const blessed = require('blessed');
-const _ = require('lodash');
+import { widget } from 'blessed';
+import * as _ from 'lodash';
+import { BaseWidget } from './BaseWidget';
 
-const BaseWidget = require('./BaseWidget');
-
-class Picker extends BaseWidget {
-  constructor(parent=null, opts={}) {
+interface PickerOptions {
+  items: any;
+  label: string;
+  keySelect: boolean;
+}
+export class Picker extends BaseWidget {
+  items: any;
+  label: any;
+  keySelect: boolean;
+  list: any;
+  constructor(parent = null, opts: PickerOptions) {
     super(Object.assign({}, opts, {
       parent,
       top: 'center',
@@ -37,7 +45,7 @@ class Picker extends BaseWidget {
 
   update() {
     this.setLabel(`{bold} ${this.label} {/}`);
-    this.list = blessed.list({
+    this.list = new widget.List({
       interactive: true,
       keys: true,
       style: {

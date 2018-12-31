@@ -1,10 +1,17 @@
-const blessed = require('blessed');
-const _ = require('lodash');
+import { widget } from 'blessed';
+import * as _ from 'lodash';
+import { MainPanel } from './MainPanel';
 
-class StatusLine extends blessed.Box {
-  constructor(opts={}) {
+interface StatusLineOptions {
+  screen: any;
+  mainPanel: MainPanel;
+}
+
+export class StatusLine extends widget.Box {
+  private readonly mainPanel: MainPanel;
+  constructor(opts: StatusLineOptions) {
     super(Object.assign({}, {
-      top: opts.screen.height-1,
+      top: opts.screen.height - 1,
       left: 0,
       width: '100%',
       height: 1,
@@ -18,7 +25,7 @@ class StatusLine extends blessed.Box {
     this.mainPanel = opts.mainPanel;
     this.mainPanel.on('update', this.update.bind(this));
     this.on('resize', () => {
-      this.position.top = opts.screen.height-1;
+      this.position.top = opts.screen.height - 1;
       this.update();
     });
     this.update();
@@ -28,8 +35,8 @@ class StatusLine extends blessed.Box {
     this.screen.log(...s);
   }
 
-  get row() { return this.mainPanel.row+1; }
-  get lastRow() { return this.mainPanel.lastRow+1; };
+  get row() { return this.mainPanel.row + 1; }
+  get lastRow() { return this.mainPanel.lastRow + 1; }
   get mode() { return this.mainPanel.mode.toUpperCase(); }
   get sort() { return this.mainPanel.sort; }
   get pageHeight() { return this.mainPanel.pageHeight; }
@@ -52,5 +59,3 @@ class StatusLine extends blessed.Box {
     this.screen.render();
   }
 }
-
-module.exports = StatusLine;

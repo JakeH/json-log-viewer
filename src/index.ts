@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-const minimist = require('minimist');
-const blessed = require('blessed');
-const _ = require('lodash');
-require('./polyfills');
+import minimist from 'minimist';
+import _ from 'lodash';
+import { widget } from 'blessed';
+import { MainPanel } from './widgets/MainPanel';
+import { StatusLine } from './widgets/StatusLine';
 
-const MainPanel = require('./widgets/MainPanel');
-const StatusLine = require('./widgets/StatusLine');
+require('./polyfills');
 
 const opts = minimist(process.argv.slice(2));
 const logFile = opts._[0];
@@ -16,11 +16,11 @@ if (!logFile) {
   process.exit(1);
 }
 
-const screen = blessed.screen({
+const screen = new widget.Screen({
   smartCSR: true,
   log: opts.log,
 });
-screen.key(['C-c'], function(_ch, _key) {
+screen.key(['C-c'], function (_ch, _key) {
   return process.exit(0);
 });
 
@@ -37,6 +37,6 @@ mainPanel.setCurrent();
 
 screen.render();
 
-process.on('SIGWINCH', function() {
+process.on('SIGWINCH', function () {
   screen.emit('resize');
 });

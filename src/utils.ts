@@ -1,8 +1,8 @@
-const _ = require('lodash');
+import * as _ from 'lodash';
 
 const COLOR_TAG_REGEX = /{\/?[\w\-,;!#]+}/g;
 
-const formatRows = (rows, columns, spacing=1, maxWidth) => {
+export const formatRows = (rows, columns, spacing = 1, maxWidth) => {
   const lengths = maxLengths(columns, rows, spacing, maxWidth);
   return rows.map(row => {
     return columns.map(column => {
@@ -27,7 +27,7 @@ const maxLengths = (columns, arr, spacing, maxWidth) => {
     });
     return map;
   }, {});
-  const lastCol = _.last(columns);
+  const lastCol: any = _.last(columns);
   const width = _.chain(lengths).values().sum().value() + (spacing * Object.keys(lengths).length);
   lengths[lastCol.key] = maxWidth - width;
   return lengths;
@@ -41,7 +41,7 @@ const stripColors = (text) => {
   return (text || '').replace(COLOR_TAG_REGEX, '').replace(/\{\/}/g, '');
 };
 
-const len = (text, ignoreColors=false) => {
+const len = (text, ignoreColors = false) => {
   if (!text) {
     return 0;
   }
@@ -51,9 +51,9 @@ const len = (text, ignoreColors=false) => {
   return stripColors(text).length;
 };
 
-const spaces = (n) => new Array(n+1).join(' ');
+const spaces = (n) => new Array(n + 1).join(' ');
 
-const padEnd = (text, length, ignoreColors=false) => {
+const padEnd = (text, length, ignoreColors = false) => {
   const nSpaces = length - len(text, ignoreColors);
   if (nSpaces < 0) {
     return trunc(text, length, ignoreColors);
@@ -61,7 +61,7 @@ const padEnd = (text, length, ignoreColors=false) => {
   return `${text}${spaces(nSpaces)}`;
 };
 
-const trunc = (text, length, ignoreColors=false) => {
+const trunc = (text, length, ignoreColors = false) => {
   if (!text) { return ''; }
   if (ignoreColors || !hasColors(text)) {
     return text.substring(0, length);
@@ -92,11 +92,9 @@ const trunc = (text, length, ignoreColors=false) => {
   return `${output}{/}`;
 };
 
-const levelColors = {
+export const levelColors = {
   debug: s => `{cyan-fg}${s}{/cyan-fg}`,
   info: s => `{#ffff94-fg}{bold}${s}{/bold}{/#ffff94-fg}`,
   warn: s => `{#ffa500-fg}${s}{/#ffa500-fg}`,
   error: s => `{red-fg}${s}{/red-fg}`,
 };
-
-module.exports = { formatRows, maxLengths, hasColors, stripColors, spaces, padEnd, len, trunc, levelColors };

@@ -1,12 +1,12 @@
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
-const ini = require('ini');
-const _ = require('lodash');
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
+import * as ini from 'ini';
+import * as _ from 'lodash';
 
 let _transform = 'unloaded';
 
-function loadTransform(_fs=fs) {
+export function loadTransform(_fs = fs) {
   if (_transform === 'unloaded') {
     const transformFile = path.join(os.homedir(), '.json-log-viewer');
     if (!_fs.existsSync(transformFile)) {
@@ -25,7 +25,7 @@ function loadTransform(_fs=fs) {
   return _transform;
 }
 
-function transform(entry, _fs=fs) {
+export function doTransform(entry, _fs = fs) {
   const transform = loadTransform(_fs);
   if (!transform) {
     return entry;
@@ -44,13 +44,13 @@ function transform(entry, _fs=fs) {
 
 function parse(line) {
   try {
-    return transform(JSON.parse(line));
+    return doTransform(JSON.parse(line));
   } catch (e) {
     return null;
   }
 }
 
-function readLog(file, reader=fs) {
+export function readLog(file, reader = fs) {
   const contents = reader.readFileSync(file).toString();
   const lines = _.compact(contents.split('\n').filter(line => line).map(parse));
 
@@ -59,6 +59,4 @@ function readLog(file, reader=fs) {
     const data = _.omit(line, ['timestamp', 'level', 'message']);
     return Object.assign({}, result, { data });
   });
-};
-
-module.exports = { readLog, transform };
+}

@@ -1,6 +1,9 @@
-const blessed = require('blessed');
+import { widget } from 'blessed';
 
-class BaseWidget extends blessed.Box {
+export interface BaseWidget {
+  handleKeyPress?(ch: string, key: { name: string });
+}
+export abstract class BaseWidget extends widget.Box {
   constructor(opts) {
     super(Object.assign({}, {
       top: 'center',
@@ -31,5 +34,3 @@ class BaseWidget extends blessed.Box {
     return this;
   }
 }
-
-module.exports = BaseWidget;

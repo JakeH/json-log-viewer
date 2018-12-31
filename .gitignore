@@ -1,3 +1,4 @@
+dist
 node_modules
 npm-debug.log
 .tmp
@@ -5,7 +6,6 @@ npm-debug.log
 public
 compiled
 .swp
-.vscode
 .env
 .DS_Store
 coverage

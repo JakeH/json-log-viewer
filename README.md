@@ -4,7 +4,7 @@
 
 > Powerful terminal based viewer for JSON logs using ncurses.
 
-![screenshot](screenshot.png)
+![screenshot](./docs/screenshot.png)
 
 **json-log-viewer** is a feature intensive viewer and analyze tool for JSON logs created by libraries like [https://github.com/winstonjs/winston](winston).
 
@@ -76,21 +76,21 @@ extra=$
 
 This way the messages will properly be displayed. The `$` has a special meaning: it tells the the old object should be included on the `extra` key on the resulting JSON. The result will look like this:
 
-![transform](transform.png)
+![transform](./docs/transform.png)
 
 ## Screenshots
 
 __Details view__
 
-![screenshot](screenshot1.png)
+![screenshot](./docs/screenshot1.png)
 
 __Filters__
 
-![screenshot](screenshot2.png)
+![screenshot](./docs/screenshot2.png)
 
 __Log level selection__
 
-![screenshot](screenshot3.png)
+![screenshot](./docs/screenshot3.png)
 
 ## License
 

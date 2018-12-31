@@ -1,26 +1,25 @@
-const blessed = require('blessed');
-const _ = require('lodash');
+import { widget } from 'blessed';
+import * as _ from 'lodash';
+import { BaseWidget } from './BaseWidget';
 
-const BaseWidget = require('./BaseWidget');
-
-const fmtKey = (rawKey, padding=undefined) => {
+const fmtKey = (rawKey: any, padding = undefined) => {
   const key = padding
-    ? `${rawKey}:`.padEnd(padding+1)
+    ? `${rawKey}:`.padEnd(padding + 1)
     : `${rawKey}:`;
   return `{blue-fg}{bold}${key}{/bold}{/blue-fg}`;
 };
-const fmtVal = (val) => ` ${val}`;
+const fmtVal = (val: any) => ` ${val}`;
 
-const spaces = (s, len) => new Array(len).join(' ') + s;
+const spaces = (s: string, len: number) => new Array(len).join(' ') + s;
 
-const formatEntry = (key, val, padding=undefined, level=0) => {
+const formatEntry = (key: string, val: any, padding = undefined, level = 0) => {
   const value = _.isObject(val)
     ? formatObject(val, level + 1)
     : fmtVal(val);
   return `${fmtKey(key, padding)}${value}`;
 };
 
-const formatObject = (obj, level=0) => {
+const formatObject = (obj: { [x: string]: any; }, level = 0) => {
   const padding = Math.max(...Object.keys(obj).map(k => k.length));
   const entries = Object.keys(obj)
     .map(key => `${formatEntry(key, obj[key], padding, level)}`)
@@ -28,8 +27,11 @@ const formatObject = (obj, level=0) => {
   return [''].concat(entries).join('\n');
 };
 
-class LogDetails extends BaseWidget {
-  constructor(opts={}) {
+export class LogDetails extends BaseWidget {
+  json: boolean;
+  el: any;
+  entry: any;
+  constructor(opts = {}) {
     super(Object.assign({}, opts, {
       width: '90%',
       height: '80%',
@@ -39,7 +41,7 @@ class LogDetails extends BaseWidget {
     this.json = false;
   }
 
-  handleKeyPress(ch, key) {
+  handleKeyPress(ch: any, key: { name: string; }) {
     if (key.name === 'enter' || key.name === 'escape') {
       this.log('detach');
       this.el.detach();
@@ -51,9 +53,9 @@ class LogDetails extends BaseWidget {
       this.json = !this.json;
       this.update();
     }
-  };
+  }
 
-  display(entry) {
+  display(entry: { timestamp: any; level: any; message: any; data: any; }) {
     this.setLabel(`{bold} ${entry.timestamp} - ${entry.level} - ${entry.message} {/}`);
     this.entry = entry.data;
     this.update();
@@ -67,7 +69,7 @@ class LogDetails extends BaseWidget {
     const content = this.json
       ? JSON.stringify(this.entry, null, 2)
       : formatObject(this.entry);
-    this.el = blessed.element({
+    this.el = new widget.Box({
       scrollable: true,
       alwaysScroll: true,
       keys: true,
@@ -82,5 +84,3 @@ class LogDetails extends BaseWidget {
     this.screen.render();
   }
 }
-
-module.exports = LogDetails;

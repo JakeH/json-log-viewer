@@ -1,17 +1,41 @@
-const blessed = require('blessed');
-const _ = require('lodash');
+import { widget } from 'blessed';
+import * as _ from 'lodash';
+import { BaseWidget } from './BaseWidget';
+import { Picker } from './Picker';
+import { LogDetails } from './LogDetails';
+import { levelColors, formatRows } from '../utils';
 
 const { readLog } = require('../log');
-const { formatRows, levelColors } = require('../utils');
-
-const BaseWidget = require('./BaseWidget');
-const LogDetails = require('./LogDetails');
-const Picker = require('./Picker');
 
 const FIELDS = ['timestamp', 'level', 'message'];
 
-class MainPanel extends BaseWidget {
-  constructor(opts = {}) {
+interface MainPanelOptions {
+  currentPage?: number;
+  initialRow?: number;
+  colSpacing?: number;
+  wrap?: boolean;
+  level: number;
+  sort: string;
+}
+
+export class MainPanel extends BaseWidget {
+  private initialRow: number;
+  public row: number; 
+  currentPage: number;
+  colSpacing: number;
+  wrap: boolean;
+  rows: any[];
+  lastSearchTerm: any;
+  levelFilter: number;
+  filters: any[];
+  sort: string;
+  mode: string;
+  updated: boolean;
+  file: any;
+  rawLines: any;
+  linesCache: any;
+
+  constructor(opts: MainPanelOptions) {
     super(Object.assign({}, { top: '0', height: '99%', handleKeys: true }, opts));
 
     this.currentPage = opts.currentPage || 1;
@@ -36,8 +60,8 @@ class MainPanel extends BaseWidget {
     this.renderLines();
   }
 
-  get pageHeight() { return this.height - 3; };
-  get pageWidth() { return this.width - 2 - 2; };
+  get pageHeight() { return parseInt(this.height.toString(), 10) - 3; }
+  get pageWidth() { return parseInt(this.width.toString(), 10) - 2 - 2; }
 
   loadFile(file) {
     this.file = file;
@@ -105,7 +129,7 @@ class MainPanel extends BaseWidget {
 
   renderLines(notify = true) {
     this.resetMode();
-    this.rows = this.lines.slice(this.initialRow, this.initialRow + this.height - 2);
+    this.rows = this.lines.slice(this.initialRow, this.initialRow + parseInt(this.height.toString(), 10) - 2);
     this.update(notify);
   }
 
@@ -312,8 +336,8 @@ class MainPanel extends BaseWidget {
   }
 
   prompt(str, value, callback) {
-    const prompt = blessed.prompt({
-      parent: this,
+    const prompt = new widget.Prompt({
+      parent: <any>this,
       border: 'line',
       height: 'shrink',
       width: 'half',
@@ -326,10 +350,10 @@ class MainPanel extends BaseWidget {
       padding: 1,
     });
 
-    prompt.input(str, value || '', (err, value) => {
+    prompt.input(str, value || '', (err, ret) => {
       if (err) { return; }
-      if (value) {
-        callback(value);
+      if (ret) {
+        callback(ret);
       } else {
         this.renderLines();
       }
@@ -363,8 +387,8 @@ class MainPanel extends BaseWidget {
   }
 
   message(str) {
-    var msg = blessed.question({
-      parent: this,
+    const msg = new widget.Question({
+      parent: <any>this,
       border: 'line',
       height: 'shrink',
       width: 'half',
@@ -419,7 +443,7 @@ class MainPanel extends BaseWidget {
   }
 
   moveToCenterViewportLine() {
-    this.row = parseInt((this.initialRow + this.pageHeight) / 2, 10);
+    this.row = (this.initialRow + this.pageHeight) / 2;
     this.renderLines();
   }
 
@@ -518,7 +542,7 @@ class MainPanel extends BaseWidget {
       this.rows, columns, this.colSpacing, this.pageWidth - 1).map(highlight).join('\n');
 
     const [existing] = this.children.filter(o => o.type === 'element');
-    const list = existing || blessed.element({ tags: true });
+    const list = <widget.List>existing || new widget.List({ tags: true });
 
     list.setContent(content);
 
@@ -529,5 +553,3 @@ class MainPanel extends BaseWidget {
     }
   }
 }
-
-module.exports = MainPanel;
