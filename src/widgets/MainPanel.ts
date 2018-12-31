@@ -20,7 +20,7 @@ interface MainPanelOptions {
 
 export class MainPanel extends BaseWidget {
   private initialRow: number;
-  public row: number; 
+  public row: number;
   currentPage: number;
   colSpacing: number;
   wrap: boolean;
@@ -541,7 +541,7 @@ export class MainPanel extends BaseWidget {
     const content = formatRows(
       this.rows, columns, this.colSpacing, this.pageWidth - 1).map(highlight).join('\n');
 
-    const [existing] = this.children.filter(o => o.type === 'element');
+    const [existing] = this.children.filter(o => o instanceof widget.List);
     const list = <widget.List>existing || new widget.List({ tags: true });
 
     list.setContent(content);
