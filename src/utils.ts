@@ -1,5 +1,3 @@
-import * as _ from 'lodash';
-
 const COLOR_TAG_REGEX = /{\/?[\w\-,;!#]+}/g;
 
 export const formatRows = (rows, columns, spacing = 1, maxWidth) => {
@@ -10,7 +8,7 @@ export const formatRows = (rows, columns, spacing = 1, maxWidth) => {
       const rawValue = row[key];
 
       try {
-        const value = _.isFunction(format) ? format(rawValue) : rawValue;
+        const value = typeof format === 'function' ? format(rawValue) : rawValue;
         return padEnd(value, lengths[key], !format);
       } catch (e) {
         return rawValue;
@@ -27,28 +25,25 @@ const maxLengths = (columns, arr, spacing, maxWidth) => {
     });
     return map;
   }, {});
-  const lastCol: any = _.last(columns);
-  const width = _.chain(lengths).values().sum().value() + (spacing * Object.keys(lengths).length);
+  const lastCol: any = columns[columns.length - 1];
+  const lenKeys = Object.keys(lengths);
+  const width = lenKeys.map(o => lengths[o]).reduce((a, c) => a + c, 0) + (spacing * lenKeys.length);
   lengths[lastCol.key] = maxWidth - width;
   return lengths;
 };
 
-const hasColors = (text) => {
+const hasColors = (text: string) => {
   return COLOR_TAG_REGEX.test(text);
 };
 
-const stripColors = (text) => {
-  return (text || '').replace(COLOR_TAG_REGEX, '').replace(/\{\/}/g, '');
-};
-
-const len = (text, ignoreColors = false) => {
+const len = (text: string, ignoreColors = false) => {
   if (!text) {
     return 0;
   }
   if (ignoreColors) {
     return text.length;
   }
-  return stripColors(text).length;
+  return (text).replace(COLOR_TAG_REGEX, '').replace(/\{\/}/g, '').length;
 };
 
 const spaces = (n) => new Array(n + 1).join(' ');

@@ -5,10 +5,10 @@ import * as ini from 'ini';
 import * as _ from 'lodash';
 
 let _transform = 'unloaded';
+const transformFile = path.join(os.homedir(), '.json-log-viewer');
 
 export function loadTransform(_fs = fs) {
   if (_transform === 'unloaded') {
-    const transformFile = path.join(os.homedir(), '.json-log-viewer');
     if (!_fs.existsSync(transformFile)) {
       return;
     }
@@ -52,11 +52,10 @@ function parse(line: string) {
 
 export function readLog(file: string, reader = fs) {
   const contents = reader.readFileSync(file).toString();
-  const lines = _.compact(contents.split('\n').filter(line => line).map(parse));
+  const lines = contents.split(/\r?\n/).filter(Boolean).map(parse);
 
   return lines.map(line => {
-    const result = _.pick(line, ['timestamp', 'level', 'message']);
-    const data = _.omit(line, ['timestamp', 'level', 'message']);
-    return Object.assign({}, result, { data });
+    const { timestamp, level, message, ...data } = line;
+    return { timestamp, level, message, data };
   });
 }

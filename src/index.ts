@@ -1,11 +1,8 @@
 #!/usr/bin/env node
 import minimist from 'minimist';
-import _ from 'lodash';
 import { widget } from 'blessed';
 import { MainPanel } from './widgets/MainPanel';
 import { StatusLine } from './widgets/StatusLine';
-
-require('./polyfills');
 
 const opts = minimist(process.argv.slice(2));
 const logFile = opts._[0];
