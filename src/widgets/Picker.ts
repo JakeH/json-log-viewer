@@ -1,5 +1,4 @@
 import { widget } from 'blessed';
-import * as _ from 'lodash';
 import { BaseWidget } from './BaseWidget';
 import { MainPanel } from './MainPanel';
 
