@@ -1,5 +1,4 @@
 import { widget } from 'blessed';
-import * as _ from 'lodash';
 import { MainPanel } from './MainPanel';
 
 interface StatusLineOptions {
