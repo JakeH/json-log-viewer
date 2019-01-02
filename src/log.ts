@@ -42,7 +42,7 @@ export function doTransform(entry, _fs = fs) {
   }, {});
 }
 
-function parse(line) {
+function parse(line: string) {
   try {
     return doTransform(JSON.parse(line));
   } catch (e) {
@@ -50,7 +50,7 @@ function parse(line) {
   }
 }
 
-export function readLog(file, reader = fs) {
+export function readLog(file: string, reader = fs) {
   const contents = reader.readFileSync(file).toString();
   const lines = _.compact(contents.split('\n').filter(line => line).map(parse));
 

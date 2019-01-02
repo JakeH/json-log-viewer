@@ -1,6 +1,7 @@
 import { widget } from 'blessed';
 import * as _ from 'lodash';
 import { BaseWidget } from './BaseWidget';
+import { MainPanel } from './MainPanel';
 
 interface PickerOptions {
   items: any;
@@ -8,11 +9,11 @@ interface PickerOptions {
   keySelect: boolean;
 }
 export class Picker extends BaseWidget {
-  items: any;
-  label: any;
+  items: string[];
+  label: string;
   keySelect: boolean;
   list: any;
-  constructor(parent = null, opts: PickerOptions) {
+  constructor(parent: MainPanel, opts: PickerOptions) {
     super(Object.assign({}, opts, {
       parent,
       top: 'center',
@@ -95,5 +96,3 @@ export class Picker extends BaseWidget {
     return this;
   }
 }
-
-module.exports = Picker;

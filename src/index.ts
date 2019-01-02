@@ -11,7 +11,6 @@ const opts = minimist(process.argv.slice(2));
 const logFile = opts._[0];
 
 if (!logFile) {
-  // eslint-disable-next-line no-console
   console.log('error: missing log file');
   process.exit(1);
 }

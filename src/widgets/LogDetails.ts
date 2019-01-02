@@ -55,7 +55,7 @@ export class LogDetails extends BaseWidget {
     }
   }
 
-  display(entry: { timestamp: any; level: any; message: any; data: any; }) {
+  display(entry: { timestamp: string; level: string; message: string; data: any; }) {
     this.setLabel(`{bold} ${entry.timestamp} - ${entry.level} - ${entry.message} {/}`);
     this.entry = entry.data;
     this.update();
