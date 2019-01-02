@@ -3,8 +3,7 @@ import { BaseWidget } from './BaseWidget';
 import { Picker } from './Picker';
 import { LogDetails } from './LogDetails';
 import { levelColors, formatRows } from '../utils';
-
-const { readLog } = require('../log');
+import { readLog } from '../log';
 
 const FIELDS = ['timestamp', 'level', 'message'];
 
@@ -538,7 +537,7 @@ export class MainPanel extends BaseWidget {
         },
       ];
 
-    const highlight = (row, index) => {
+    const highlight = (row: string, index: number) => {
       const str = row.split('\n')[0];
       if (index === this.relativeRow) {
         return `{white-bg}{black-fg}${str}{/}`;
@@ -546,8 +545,7 @@ export class MainPanel extends BaseWidget {
       return str;
     };
 
-    const content = formatRows(
-      this.rows, columns, this.colSpacing, this.pageWidth - 1).map(highlight).join('\n');
+    const content = formatRows(this.rows, columns, this.colSpacing, this.pageWidth - 1).map(highlight).join('\n');
 
     const [existing] = this.children.filter(o => o instanceof widget.List);
     const list = <widget.List>existing || new widget.List({ tags: true });

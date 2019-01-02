@@ -88,8 +88,8 @@ const trunc = (text, length, ignoreColors = false) => {
 };
 
 export const levelColors = {
-  debug: s => `{cyan-fg}${s}{/cyan-fg}`,
-  info: s => `{#ffff94-fg}{bold}${s}{/bold}{/#ffff94-fg}`,
-  warn: s => `{#ffa500-fg}${s}{/#ffa500-fg}`,
-  error: s => `{red-fg}${s}{/red-fg}`,
+  debug: (s: string) => `{cyan-fg}${s}{/cyan-fg}`,
+  info: (s: string) => `{#ffff94-fg}{bold}${s}{/bold}{/#ffff94-fg}`,
+  warn: (s: string) => `{#ffa500-fg}${s}{/#ffa500-fg}`,
+  error: (s: string) => `{red-fg}${s}{/red-fg}`,
 };

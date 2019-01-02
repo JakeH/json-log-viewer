@@ -1,20 +1,19 @@
 import { widget } from 'blessed';
 import { BaseWidget } from './BaseWidget';
 
-const fmtKey = (rawKey: any, padding = undefined) => {
+const fmtKey = (rawKey: any, padding: number) => {
   const key = padding
     ? `${rawKey}:`.padEnd(padding + 1)
     : `${rawKey}:`;
   return `{blue-fg}{bold}${key}{/bold}{/blue-fg}`;
 };
-const fmtVal = (val: any) => ` ${val}`;
 
 const spaces = (s: string, len: number) => new Array(len).join(' ') + s;
 
-const formatEntry = (key: string, val: any, padding = undefined, level = 0) => {
-  const value =  val && typeof val === 'object'
+const formatEntry = (key: string, val: any, padding: number, level = 0) => {
+  const value = val && typeof val === 'object'
     ? formatObject(val, level + 1)
-    : fmtVal(val);
+    : ` ${val}`;
   return `${fmtKey(key, padding)}${value}`;
 };
 
@@ -22,7 +21,7 @@ const formatObject = (obj: { [x: string]: any; }, level = 0) => {
   const padding = Math.max(...Object.keys(obj).map(k => k.length));
   const entries = Object.keys(obj)
     .map(key => `${formatEntry(key, obj[key], padding, level)}`)
-    .map(val => spaces(val, level * 2));
+    .map((val: string) => spaces(val, level * 2));
   return [''].concat(entries).join('\n');
 };
 

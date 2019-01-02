@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import { config } from './config';
 
 function parse(line: string) {
   try {
@@ -14,6 +15,11 @@ export function readLog(file: string) {
 
   return lines.map(line => {
     const { timestamp, level, message, ...data } = line;
-    return { timestamp, level, message, data };
+    return {
+      timestamp: config.useLocalTime ? new Date(timestamp) : timestamp,
+      level,
+      message,
+      data
+    };
   });
 }
