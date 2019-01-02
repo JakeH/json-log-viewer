@@ -1,5 +1,4 @@
 import { widget } from 'blessed';
-import * as _ from 'lodash';
 import { BaseWidget } from './BaseWidget';
 
 const fmtKey = (rawKey: any, padding = undefined) => {
@@ -13,7 +12,7 @@ const fmtVal = (val: any) => ` ${val}`;
 const spaces = (s: string, len: number) => new Array(len).join(' ') + s;
 
 const formatEntry = (key: string, val: any, padding = undefined, level = 0) => {
-  const value = _.isObject(val)
+  const value =  val && typeof val === 'object'
     ? formatObject(val, level + 1)
     : fmtVal(val);
   return `${fmtKey(key, padding)}${value}`;

@@ -33,11 +33,7 @@ export function doTransform(entry, _fs = fs) {
 
   return Object.keys(transform).reduce((hash, key) => {
     const value = transform[key];
-    if (value === '$') {
-      hash[key] = _.cloneDeep(entry);
-    } else {
-      hash[key] = _.get(entry, value);
-    }
+    hash[key] = entry[value];
     return hash;
   }, {});
 }

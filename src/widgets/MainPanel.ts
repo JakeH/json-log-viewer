@@ -1,5 +1,4 @@
 import { widget } from 'blessed';
-import * as _ from 'lodash';
 import { BaseWidget } from './BaseWidget';
 import { Picker } from './Picker';
 import { LogDetails } from './LogDetails';
@@ -89,18 +88,17 @@ export class MainPanel extends BaseWidget {
 
     this.log('calcLines', this.sort, this.filters, this.levelFilter);
 
-    const sort = (lines) => {
+    const sort = (lines: object[]) => {
       if (!this.sort) { return lines; }
 
-      const sorted = _.chain(lines).sortBy(this.sortKey);
-      if (this.sort.startsWith('-')) {
-        return sorted.reverse().value();
-      }
+      const key = this.sortKey;
+      const sorted = lines.filter(Boolean).sort((a, b) => (a[key] > b[key]) ? 1 : ((b[key] > a[key]) ? -1 : 0));
 
-      return sorted.value();
+      return this.sort.startsWith('-') ? sorted.reverse() : sorted;
+
     };
 
-    const filters = _.cloneDeep(this.filters);
+    const filters = Array.from(this.filters);
     if (this.levelFilter) {
       filters.push({ key: 'level', value: this.levelFilter });
     }
@@ -115,7 +113,7 @@ export class MainPanel extends BaseWidget {
       return filters.reduce((bool, filter) => {
         const key = FIELDS.indexOf(filter.key) > -1
           ? filter.key : `data.${filter.key}`;
-        const value = _.get(line, key);
+        const value = line[key];
         if (!value) { return false; }
         if (!filter.method) {
           return value && value === filter.value;
@@ -523,12 +521,22 @@ export class MainPanel extends BaseWidget {
   update(notify = true) {
     this.setLabel(`[{bold} ${this.file} {/}] [{bold} ${this.row + 1}/${this.lastRow + 1} {/}]`);
 
-    const columns = [
-      { title: 'Timestamp', key: 'timestamp' },
-      { title: 'Level', key: 'level', format: v => levelColors[v](v) },
-      { title: 'D', key: 'data', length: 1, format: v => _.isEmpty(v) ? ' ' : '*' },
-      { title: 'Message', key: 'message' },
-    ];
+    const columns: Array<{
+      title: string, key: string, length?: number, format?: (value: object | string) => string
+    }> = [
+        {
+          title: 'Timestamp', key: 'timestamp'
+        },
+        {
+          title: 'Level', key: 'level', format: (v: string) => levelColors[v](v)
+        },
+        {
+          title: 'D', key: 'data', length: 1, format: (v: object) => Object.keys(v).filter(k => v.hasOwnProperty(k)).length ? '*' : ' '
+        },
+        {
+          title: 'Message', key: 'message'
+        },
+      ];
 
     const highlight = (row, index) => {
       const str = row.split('\n')[0];
