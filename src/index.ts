@@ -22,8 +22,7 @@ screen.key(['C-c'], function (_ch, _key) {
 });
 
 const level = opts.l || opts.level;
-const sort = opts.s || opts.sort;
-const args = { screen, level, sort };
+const args = { screen, level };
 
 const provider = new FileLogProvider(logFile);
 const mainPanel = new MainPanel(args, provider);

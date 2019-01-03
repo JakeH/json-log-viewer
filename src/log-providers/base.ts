@@ -4,7 +4,9 @@ import { config } from '../config';
 
 export interface LogProvider {
 
-    getLines(): Promise<Line[]>;
+    lineCount: number;
+
+    getLines(start: number, end?: number): Promise<Line[]>;
 
     // events
     on(event: 'source-updated', listener: () => void): this;
@@ -12,7 +14,8 @@ export interface LogProvider {
 }
 
 export abstract class LogProviderBase extends EventEmitter implements LogProvider {
-    abstract getLines(): Promise<Line[]>;
+    abstract lineCount: number;
+    abstract getLines(start: number, end?: number): Promise<Line[]>;
 
     protected parseLine(line: string): Line {
         const parsed = JSON.parse(line);
@@ -21,7 +24,7 @@ export abstract class LogProviderBase extends EventEmitter implements LogProvide
             timestamp: config.useLocalTime ? new Date(timestamp) : timestamp,
             level,
             message,
-            data
+            data: !data || !Object.keys(data).filter(k => data.hasOwnProperty(k)).length ? undefined : data
         };
     }
 }

@@ -6,24 +6,30 @@ import { Line } from '../models/line';
 const readProm = promisify(readFile);
 
 export class FileLogProvider extends LogProviderBase {
-  private lines: Line[];
+
+  public lineCount: number;
 
   constructor(private filename: string) {
     super();
   }
 
-  public async getLines(): Promise<Line[]> {
+  public async getLines(start: number, end: number = Number.MAX_SAFE_INTEGER): Promise<Line[]> {
 
-    if (!this.lines) {
-      const contents = await readProm(this.filename, 'utf8');
+    const contents = await readProm(this.filename, 'utf8');
 
-      this.lines =
-        contents.split(/\r?\n/)
-          .filter(Boolean)
-          .map(super.parseLine);
-    }
+    const lines =
+      contents.split(/\r?\n/)
+        .filter(Boolean)
+        .reverse();
 
-    return this.lines;
+    this.lineCount = lines.length;
+
+    const filteredLines =
+      lines.map((val, i) => i >= start && i <= end ? val : undefined)
+        .filter(Boolean)
+        .map(super.parseLine);
+
+    return filteredLines;
   }
 
 }

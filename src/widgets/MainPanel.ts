@@ -4,6 +4,7 @@ import { Picker } from './Picker';
 import { LogDetails } from './LogDetails';
 import { levelColors, formatRows } from '../utils';
 import { LogProvider } from '../log-providers/base';
+import { Line } from '../models/line';
 
 const FIELDS = ['timestamp', 'level', 'message'];
 
@@ -13,26 +14,25 @@ interface MainPanelOptions {
   colSpacing?: number;
   wrap?: boolean;
   level: number;
-  sort: string;
 }
 
 export class MainPanel extends BaseWidget {
   private initialRow: number;
   public row: number;
+ 
   currentPage: number;
   colSpacing: number;
   wrap: boolean;
-  rows: any[];
+  rows: Line[];
   lastSearchTerm: any;
   levelFilter: number;
   filters: any[];
-  sort: string;
   mode: string;
   updated: boolean;
   rawLines: any;
   linesCache: any;
 
-  constructor(opts: MainPanelOptions, logProvider: LogProvider) {
+  constructor(opts: MainPanelOptions, private logProvider: LogProvider) {
     super(Object.assign({}, { top: '0', height: '99%', handleKeys: true }, opts));
 
     this.currentPage = opts.currentPage || 1;
@@ -41,11 +41,13 @@ export class MainPanel extends BaseWidget {
     this.wrap = opts.wrap || true;
     this.row = 0;
     this.rows = [];
+
     this.lastSearchTerm = null;
     this.levelFilter = opts.level;
+
     this.filters = [];
-    this.sort = opts.sort || '-timestamp';
     this.mode = 'normal';
+
     this.updated = true;
 
     this.log('pageWidth', this.pageWidth);
@@ -55,12 +57,12 @@ export class MainPanel extends BaseWidget {
       this.renderLines();
     });
 
-    logProvider.getLines().then(lines => {
+    this.logProvider.getLines(0).then(lines => {
       this.rawLines = lines;
       this.log('loaded', this.rawLines.length);
-
+      this.screen.render();
+      this.fixCursor();
       this.renderLines();
-
     });
   }
 
@@ -84,17 +86,7 @@ export class MainPanel extends BaseWidget {
       return [];
     }
 
-    this.log('calcLines', this.sort, this.filters, this.levelFilter);
-
-    const sort = (lines: object[]) => {
-      if (!this.sort) { return lines; }
-
-      const key = this.sortKey;
-      const sorted = lines.filter(Boolean).sort((a, b) => (a[key] > b[key]) ? 1 : ((b[key] > a[key]) ? -1 : 0));
-
-      return this.sort.startsWith('-') ? sorted.reverse() : sorted;
-
-    };
+    this.log('calcLines', this.filters, this.levelFilter);
 
     const filters = Array.from(this.filters);
     if (this.levelFilter) {
@@ -102,12 +94,12 @@ export class MainPanel extends BaseWidget {
     }
 
     if (!filters.length) {
-      return sort(this.rawLines);
+      return this.rawLines;
     }
 
     this.log('filters', filters);
 
-    return sort(this.rawLines.filter(line => {
+    return this.rawLines.filter(line => {
       return filters.reduce((bool, filter) => {
         const key = FIELDS.indexOf(filter.key) > -1
           ? filter.key : `data.${filter.key}`;
@@ -120,12 +112,13 @@ export class MainPanel extends BaseWidget {
           return value && value.toString().toLowerCase().indexOf(filter.value.toLowerCase()) > -1;
         }
       }, true);
-    }));
+    });
   }
 
-  renderLines(notify = true) {
+  async renderLines(notify = true) {
     this.resetMode();
-    this.rows = this.lines.slice(this.initialRow, this.initialRow + parseInt(this.height.toString(), 10) - 2);
+    this.rows = await this.logProvider.getLines(this.initialRow, this.initialRow + parseInt(this.height.toString(), 10) - 2);
+    // this.rows = this.lines.slice(this.initialRow, this.initialRow + parseInt(this.height.toString(), 10) - 2);
     this.update(notify);
   }
 
@@ -186,10 +179,6 @@ export class MainPanel extends BaseWidget {
       this.openGoToLine();
       return;
     }
-    if (ch === 's') {
-      this.openSort();
-      return;
-    }
     if (ch === 'f') {
       if (this.filters.length || this.levelFilter) {
         return this.clearFilters();
@@ -229,34 +218,12 @@ export class MainPanel extends BaseWidget {
     });
   }
 
-  get sortKey() {
-    return this.sort && this.sort.replace(/^-/, '');
-  }
-
-  get sortAsc() {
-    return !/^-/.test(this.sort);
-  }
-
-  openSort() {
-    this.setMode('sort');
-    this.openPicker('Sort by', FIELDS, (err, sort) => {
-      if (!sort) { return this.resetMode(); }
-      if (err) { return; }
-      if (this.sortKey === sort && this.sortAsc) {
-        return this.setSort(`-${sort}`);
-      }
-      this.setSort(sort);
-    });
-  }
-
   setUpdated() {
     this.updated = true;
-    this.emit('update');
   }
 
   setMode(mode) {
     this.mode = mode;
-    this.emit('update');
   }
 
   resetMode() {
@@ -295,11 +262,6 @@ export class MainPanel extends BaseWidget {
       if (!value) { return this.resetMode(); }
       this.setFilter(field, value, 'contains');
     });
-  }
-
-  setSort(sort) {
-    this.sort = sort;
-    this.renderLines();
   }
 
   setLevelFilter(level) {
@@ -504,8 +466,12 @@ export class MainPanel extends BaseWidget {
   }
 
   displayDetails() {
+    const currentRow = this.rows[this.relativeRow];
+    if (!currentRow.data) {
+      return;
+    }
     const details = new LogDetails({ screen: this.screen });
-    details.display(this.rows[this.relativeRow]);
+    details.display(currentRow);
   }
 
   get relativeRow() {
@@ -529,7 +495,7 @@ export class MainPanel extends BaseWidget {
           title: 'Level', key: 'level', format: (v: string) => levelColors[v](v)
         },
         {
-          title: 'D', key: 'data', length: 1, format: (v: object) => Object.keys(v).filter(k => v.hasOwnProperty(k)).length ? '*' : ' '
+          title: 'D', key: 'data', length: 1, format: (v: object) => v ? '*' : ' '
         },
         {
           title: 'Message', key: 'message'

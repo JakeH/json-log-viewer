@@ -37,7 +37,6 @@ export class StatusLine extends widget.Box {
   get row() { return this.mainPanel.row + 1; }
   get lastRow() { return this.mainPanel.lastRow + 1; }
   get mode() { return this.mainPanel.mode.toUpperCase(); }
-  get sort() { return this.mainPanel.sort; }
   get pageHeight() { return this.mainPanel.pageHeight; }
   get filters() {
     const { filters, levelFilter } = this.mainPanel;
@@ -51,10 +50,9 @@ export class StatusLine extends widget.Box {
     const mode = `{yellow-bg}{black-fg}{bold} ${this.mode} {/}`;
     const line = `{bold}${this.row}{/}/{bold}${this.lastRow}{/}`;
     const pageSize = `| {bold}${this.pageHeight}{/}`;
-    const sort = this.sort ? `| sort: {bold}${this.sort}{/}` : '';
     const filterExpr = this.filters.map(f => `${f.key}:${f.value}`).join(' ');
     const filters = filterExpr ? `| filters: {bold}${filterExpr}{/}` : '';
-    this.setContent(` ${mode} ${line} ${pageSize} ${sort} ${filters}`);
+    this.setContent(` ${mode} ${line} ${pageSize} ${filters}`);
     this.screen.render();
   }
 }

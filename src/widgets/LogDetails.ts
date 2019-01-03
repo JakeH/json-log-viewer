@@ -1,5 +1,6 @@
 import { widget } from 'blessed';
 import { BaseWidget } from './BaseWidget';
+import { Line } from '../models/line';
 
 const fmtKey = (rawKey: any, padding: number) => {
   const key = padding
@@ -53,7 +54,7 @@ export class LogDetails extends BaseWidget {
     }
   }
 
-  display(entry: { timestamp: string; level: string; message: string; data: any; }) {
+  display(entry: Line) {
     this.setLabel(`{bold} ${entry.timestamp} - ${entry.level} - ${entry.message} {/}`);
     this.entry = entry.data;
     this.update();
