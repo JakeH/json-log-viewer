@@ -3,7 +3,7 @@ import { BaseWidget } from './BaseWidget';
 import { Picker } from './Picker';
 import { LogDetails } from './LogDetails';
 import { levelColors, formatRows } from '../utils';
-import { readLog } from '../log';
+import { LogProvider } from '../log-providers/base';
 
 const FIELDS = ['timestamp', 'level', 'message'];
 
@@ -29,11 +29,10 @@ export class MainPanel extends BaseWidget {
   sort: string;
   mode: string;
   updated: boolean;
-  file: any;
   rawLines: any;
   linesCache: any;
 
-  constructor(opts: MainPanelOptions) {
+  constructor(opts: MainPanelOptions, logProvider: LogProvider) {
     super(Object.assign({}, { top: '0', height: '99%', handleKeys: true }, opts));
 
     this.currentPage = opts.currentPage || 1;
@@ -55,18 +54,18 @@ export class MainPanel extends BaseWidget {
       this.fixCursor();
       this.renderLines();
     });
-    this.renderLines();
+
+    logProvider.getLines().then(lines => {
+      this.rawLines = lines;
+      this.log('loaded', this.rawLines.length);
+
+      this.renderLines();
+
+    });
   }
 
   get pageHeight() { return parseInt(this.height.toString(), 10) - 3; }
   get pageWidth() { return parseInt(this.width.toString(), 10) - 2 - 2; }
-
-  loadFile(file) {
-    this.file = file;
-    this.rawLines = readLog(file);
-    this.log('loaded', this.lines.length);
-    this.renderLines();
-  }
 
   get lastRow() {
     return (this.lines || []).length - 1;
@@ -518,7 +517,7 @@ export class MainPanel extends BaseWidget {
   }
 
   update(notify = true) {
-    this.setLabel(`[{bold} ${this.file} {/}] [{bold} ${this.row + 1}/${this.lastRow + 1} {/}]`);
+    this.setLabel(`[{bold} ${this.row + 1}/${this.lastRow + 1} {/}]`);
 
     const columns: Array<{
       title: string, key: string, length?: number, format?: (value: object | string) => string

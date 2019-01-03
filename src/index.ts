@@ -3,6 +3,7 @@ import minimist from 'minimist';
 import { widget } from 'blessed';
 import { MainPanel } from './widgets/MainPanel';
 import { StatusLine } from './widgets/StatusLine';
+import { FileLogProvider } from './log-providers/file';
 
 const opts = minimist(process.argv.slice(2));
 const logFile = opts._[0];
@@ -24,8 +25,8 @@ const level = opts.l || opts.level;
 const sort = opts.s || opts.sort;
 const args = { screen, level, sort };
 
-const mainPanel = new MainPanel(args);
-mainPanel.loadFile(logFile);
+const provider = new FileLogProvider(logFile);
+const mainPanel = new MainPanel(args, provider);
 
 const statusLine = new StatusLine({ screen, mainPanel });
 screen.append(statusLine);

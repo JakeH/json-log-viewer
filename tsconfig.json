@@ -3,7 +3,7 @@
     "compilerOptions": {
         "sourceMap": true,
         "noUnusedLocals": true,
-        "baseUrl": ".",
+        // "baseUrl": ".",
         "outDir": "./dist/",
         "declaration": true,
         "moduleResolution": "node",
